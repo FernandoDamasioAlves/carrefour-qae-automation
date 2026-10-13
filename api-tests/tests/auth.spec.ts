@@ -65,4 +65,33 @@ describe('Authentication API | JWT', () => {
     expect(response.body.message)
       .toMatch(/Token de acesso/i);
   });
+
+  it('API-013 | deve aceitar token válido em rota protegida', async () => {
+    const user = makeUser({ administrador: 'true' });
+    let userId: string | undefined;
+
+    try {
+      const created = await users.create(user);
+
+      expect(created.status).toBe(201);
+      userId = created.body._id;
+
+      const login = await auth.login(user.email, user.password);
+
+      expect(login.status).toBe(200);
+      expect(login.body.authorization).toMatch(/^Bearer .+/);
+
+      const response = await auth.getProtectedProducts(
+        login.body.authorization
+      );
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty('nome');
+    } finally {
+      if (userId) {
+        await users.delete(userId);
+      }
+    }
+  });
+
 });

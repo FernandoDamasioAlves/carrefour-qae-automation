@@ -81,3 +81,34 @@ Funcionalidade: Gerenciamento de usuários e autenticação na API ServeRest
     Dado que não possuo um token de autenticação
     Quando tento acessar um recurso protegido
     Então a API deve negar o acesso
+
+
+  @API-013
+  Cenário: Permitir token válido alcançar a validação de recurso protegido
+    Dado que existe um usuário administrador com credenciais válidas
+    E que obtenho um token por autenticação
+    Quando envio uma requisição com token válido e corpo incompleto
+    Então a API deve validar os campos obrigatórios do recurso
+    E não deve rejeitar a requisição por ausência de token
+
+  @API-014
+  Esquema do Cenário: Rejeitar cadastro sem campo obrigatório
+    Dado que possuo dados sintéticos sem o campo "<campo>"
+    Quando tento cadastrar o usuário
+    Então a API deve rejeitar o cadastro
+    E deve indicar a ausência do campo "<campo>"
+
+    Exemplos:
+      | campo    |
+      | email    |
+      | password |
+
+
+  @API-015 @simulacao
+  Cenário: Bloquear a requisição 101 em ambiente controlado
+    Dado que existe um servidor HTTP simulado com limite de 100 requisições
+    Quando realizo 100 requisições ao servidor local
+    Então todas devem retornar HTTP 200
+    Quando realizo a requisição 101
+    Então devo receber HTTP 429
+    E o cabeçalho Retry-After deve indicar 60 segundos

@@ -29,3 +29,13 @@
 
 # Cópia local do relatório técnico
 docs/RELATORIO_TECNICO_BACKUP.docx
+
+# Backup intermediário do relatório
+docs/RELATORIO_TECNICO_PRE_15_API.docx
+
+# Histórico local de execuções Allure
+**/allure-results-historico-*/
+
+# Pacotes locais de evidências
+/entrega/
+/**/allure-results-historico-*/

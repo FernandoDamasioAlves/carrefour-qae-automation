@@ -31,7 +31,7 @@ Projeto de automação de testes de API e Mobile, desenvolvido para o desafio t�
 - Verificação de contratos de resposta.
 - Autenticação.
 
-**Resultado local:** 12 testes aprovados.
+**Resultado local:** 16 testes de API aprovados.
 
 **Relatório JUnit:** `api-tests/reports/junit.xml`.
 
@@ -115,7 +115,7 @@ O relatório técnico está disponível em `docs/RELATORIO_TECNICO.docx`.
 
 As especificações comportamentais estão disponíveis em:
 
-- `bdd/api.feature`: 12 cenários de API, identificados de API-001 a API-012.
+- `bdd/api.feature`: 14 definições BDD de API (15 exemplos executáveis), identificados de API-001 a API-014.
 - `bdd/mobile.feature`: 10 cenários Mobile, identificados de MOB-001 a MOB-010.
 
 Os arquivos utilizam Gherkin em português, com Dado/Quando/Então.
@@ -123,3 +123,41 @@ Os arquivos utilizam Gherkin em português, com Dado/Quando/Então.
 Cada cenário corresponde funcionalmente a um teste automatizado existente.
 A automação é executada com Vitest (API) e WebdriverIO/Mocha (Mobile).
 Os arquivos `.feature` não possuem integração com Cucumber nem step definitions.
+
+### Cobertura adicional de API
+
+- API-013: Token válido permite alcançar a validação de recurso protegido.
+- API-014: Cadastro sem e-mail e sem senha, em duas variações.
+- Suíte completa: 16 testes de API aprovados em 13/10/2026.
+- TypeScript: verificação `npm run typecheck` aprovada.
+
+O limite de 100 requisições/minuto ainda não foi validado.
+
+## Teste isolado de rate limiting
+
+O teste `api-tests/tests/rate-limit.spec.ts` (API-015) utiliza
+um servidor HTTP local e verifica 100 respostas HTTP 200 seguidas
+por HTTP 429 na requisição 101.
+
+Ele demonstra o comportamento de bloqueio simulado, mas não valida
+o limite real da ServeRest nem uma janela temporal de um minuto.
+
+A suíte API contém 16 testes automatizados, incluindo essa simulação.
+
+## Resultado consolidado da validação local
+
+- API: 16 testes aprovados, distribuídos em 6 arquivos, incluindo
+  o API-015 de rate limiting simulado em servidor local.
+- Mobile Android: 10 testes aprovados em 6 arquivos.
+- Allure: relatório final com 10 resultados aprovados,
+  nenhuma falha, nenhum erro e nenhum teste ignorado.
+- Evidência Mobile: `entrega/evidencias/allure-mobile-android.zip`
+  (fornecida separadamente do código-fonte).
+- API: relatório JUnit gerado em `api-tests/reports/junit.xml`.
+- BDD: 15 definições de API, incluindo um esquema com 2 exemplos,
+  e 10 cenários Mobile.
+- iOS: configuração inicial disponível, execução não realizada.
+- GitLab CI/CD: configuração criada, execução não realizada.
+
+A simulação API-015 não comprova o limite real de 100
+requisições por minuto da API ServeRest.

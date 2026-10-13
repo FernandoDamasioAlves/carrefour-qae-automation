@@ -17,9 +17,20 @@ class LoginPage {
     return $('~button-LOGIN');
   }
 
+  get loginFormTab() {
+    return $('~button-login-container');
+  }
+
   async open() {
+    await this.loginTab.waitForDisplayed({ timeout: 10000 });
     await this.loginTab.click();
-    await this.emailInput.waitForDisplayed();
+
+    await this.loginFormTab.waitForDisplayed({ timeout: 10000 });
+    await this.loginFormTab.click();
+
+    await this.emailInput.waitForDisplayed({ timeout: 10000 });
+    await this.passwordInput.waitForDisplayed({ timeout: 10000 });
+    await this.loginButton.waitForDisplayed({ timeout: 10000 });
   }
 
   async fillCredentials(email, password) {

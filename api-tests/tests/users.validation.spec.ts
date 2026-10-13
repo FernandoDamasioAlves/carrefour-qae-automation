@@ -33,4 +33,24 @@ describe('Users API | Validações', () => {
     expect(response.status).toBe(400);
     expect(response.body).toHaveProperty('message');
   });
+
+  it.each([
+    ['email', 'email'],
+    ['password', 'password']
+  ])(
+    'API-014 | deve rejeitar cadastro sem o campo %s',
+    async (field, expectedField) => {
+      const payload = { ...makeUser() };
+
+      delete (payload as Record<string, unknown>)[field];
+
+      const response = await client.create(
+        payload as ReturnType<typeof makeUser>
+      );
+
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty(expectedField);
+    }
+  );
+
 });
