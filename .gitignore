@@ -1,0 +1,31 @@
+**/node_modules/
+**/reports/
+**/coverage/
+**/dist/
+.env
+.env.*
+!.env.example
+.DS_Store
+
+# Mobile automation
+**/allure-results/
+**/allure-report/
+**/artifacts/
+**/screenshots/
+**/apps/
+**/.env
+**/.env.local
+
+# Relatórios locais de auditoria
+**/audit-report.json
+
+# Ambiente local de documentação
+.venv-docs/
+.venv/
+**/__pycache__/
+
+# Arquivos temporários de auditoria
+**/audit-fix-preview.txt
+
+# Cópia local do relatório técnico
+docs/RELATORIO_TECNICO_BACKUP.docx
