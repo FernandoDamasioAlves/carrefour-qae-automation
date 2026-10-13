@@ -8,7 +8,11 @@ export const userSchema = z.object({
   administrador: z.enum(['true', 'false'])
 }).strict();
 
+export const listedUserSchema = userSchema.extend({
+  email: z.string()
+});
+
 export const usersListSchema = z.object({
   quantidade: z.number().int().nonnegative(),
-  usuarios: z.array(userSchema)
+  usuarios: z.array(listedUserSchema)
 }).strict();

@@ -112,3 +112,45 @@ Funcionalidade: Gerenciamento de usuários e autenticação na API ServeRest
     Quando realizo a requisição 101
     Então devo receber HTTP 429
     E o cabeçalho Retry-After deve indicar 60 segundos
+
+  @API-016
+  Cenário: Rejeitar cadastro com e-mail duplicado
+    Dado que existe um usuário cadastrado com um e-mail único
+    Quando tento cadastrar outro usuário com o mesmo e-mail
+    Então a API deve responder HTTP 400
+    E deve informar que o e-mail já está sendo usado
+
+  @API-017
+  Cenário: Rejeitar cadastro sem campo administrador
+    Dado que possuo dados válidos sem o campo administrador
+    Quando tento cadastrar o usuário
+    Então a API deve responder HTTP 400
+    E deve indicar que o campo administrador é obrigatório
+
+  @API-018
+  Cenário: Rejeitar acesso com token inválido
+    Dado que possuo um token de autenticação inválido
+    Quando tento acessar um recurso protegido
+    Então a API deve responder HTTP 401
+    E deve informar um problema com o token de acesso
+
+  @API-019
+  Cenário: Rejeitar autenticação sem e-mail
+    Dado que possuo uma requisição de login sem e-mail
+    Quando tento autenticar
+    Então a API deve responder HTTP 400
+    E deve indicar a ausência do e-mail
+
+  @API-020
+  Cenário: Rejeitar autenticação sem senha
+    Dado que possuo uma requisição de login sem senha
+    Quando tento autenticar
+    Então a API deve responder HTTP 400
+    E deve indicar a ausência da senha
+
+  @API-021
+  Cenário: Tratar exclusão de usuário inexistente
+    Dado que possuo um identificador de usuário inexistente
+    Quando solicito a exclusão desse usuário
+    Então a API deve responder HTTP 200
+    E deve informar que nenhum registro foi excluído

@@ -39,3 +39,6 @@ docs/RELATORIO_TECNICO_PRE_15_API.docx
 # Pacotes locais de evidências
 /entrega/
 /**/allure-results-historico-*/
+
+# Backups locais do relatório técnico
+/docs/RELATORIO_TECNICO_ANTES_33_TESTES.docx

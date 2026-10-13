@@ -1,54 +1,59 @@
-import { createServer } from 'node:http';
+import express from 'express';
+import rateLimit from 'express-rate-limit';
 import request from 'supertest';
 import { describe, expect, it } from 'vitest';
 
-describe('API-015 | Rate limiting em ambiente controlado', () => {
-  it('deve permitir 100 requisições e bloquear a 101ª', async () => {
-    const limit = 100;
-    let requests = 0;
+describe('API-015 | Rate limiting em ambiente local controlado', () => {
+  it('deve bloquear a requisição 101 dentro da janela de 60 segundos', async () => {
+    const app = express();
 
-    const server = createServer((req, res) => {
-      if (req.url !== '/usuarios') {
-        res.writeHead(404).end();
-        return;
-      }
-
-      requests += 1;
-
-      if (requests > limit) {
-        res.writeHead(429, {
-          'Content-Type': 'application/json',
-          'Retry-After': '60'
-        });
-
-        res.end(JSON.stringify({
-          message: 'Limite de requisições excedido'
-        }));
-        return;
-      }
-
-      res.writeHead(200, {
-        'Content-Type': 'application/json'
-      });
-
-      res.end(JSON.stringify({ usuarios: [] }));
+    const limiter = rateLimit({
+      windowMs: 60_000,
+      limit: 100,
+      standardHeaders: 'draft-7',
+      legacyHeaders: false
     });
 
-    try {
-      for (let i = 0; i < limit; i++) {
-        const response = await request(server).get('/usuarios');
-        expect(response.status).toBe(200);
-      }
+    app.use('/usuarios', limiter);
 
-      const blocked = await request(server).get('/usuarios');
+    app.get('/usuarios', (_req, res) => {
+      res.status(200).json({ usuarios: [] });
+    });
 
-      expect(blocked.status).toBe(429);
-      expect(blocked.headers['retry-after']).toBe('60');
-      expect(blocked.body.message)
-        .toBe('Limite de requisições excedido');
-    } finally {
-      server.closeAllConnections();
-      server.close();
+    for (let i = 0; i < 100; i++) {
+      const response = await request(app).get('/usuarios');
+      expect(response.status).toBe(200);
     }
+
+    const blocked = await request(app).get('/usuarios');
+
+    expect(blocked.status).toBe(429);
+    expect(blocked.headers['retry-after']).toBeDefined();
   });
+
+  it('API-015 | deve liberar novas requisições após a janela', async () => {
+    const app = express();
+
+    const limiter = rateLimit({
+      windowMs: 1000,
+      limit: 2,
+      standardHeaders: 'draft-7',
+      legacyHeaders: false
+    });
+
+    app.use('/usuarios', limiter);
+
+    app.get('/usuarios', (_req, res) => {
+      res.status(200).json({ usuarios: [] });
+    });
+
+    expect((await request(app).get('/usuarios')).status).toBe(200);
+    expect((await request(app).get('/usuarios')).status).toBe(200);
+    expect((await request(app).get('/usuarios')).status).toBe(429);
+
+    await new Promise(resolve => setTimeout(resolve, 1200));
+
+    expect((await request(app).get('/usuarios')).status).toBe(200);
+  });
+
 });

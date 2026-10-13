@@ -31,7 +31,7 @@ Projeto de automação de testes de API e Mobile, desenvolvido para o desafio t�
 - Verificação de contratos de resposta.
 - Autenticação.
 
-**Resultado local:** 16 testes de API aprovados.
+**Resultado local:** 23 testes de API aprovados em 7 arquivos.
 
 **Relatório JUnit:** `api-tests/reports/junit.xml`.
 
@@ -128,36 +128,45 @@ Os arquivos `.feature` não possuem integração com Cucumber nem step definitio
 
 - API-013: Token válido permite alcançar a validação de recurso protegido.
 - API-014: Cadastro sem e-mail e sem senha, em duas variações.
-- Suíte completa: 16 testes de API aprovados em 13/10/2026.
+- Suíte completa: 23 testes de API aprovados em 13/10/2026.
 - TypeScript: verificação `npm run typecheck` aprovada.
 
 O limite de 100 requisições/minuto ainda não foi validado.
 
-## Teste isolado de rate limiting
+## Rate limiting — validação controlada
 
-O teste `api-tests/tests/rate-limit.spec.ts` (API-015) utiliza
-um servidor HTTP local e verifica 100 respostas HTTP 200 seguidas
-por HTTP 429 na requisição 101.
+O arquivo `api-tests/tests/rate-limit.spec.ts` utiliza
+`express-rate-limit` em um servidor Express local.
 
-Ele demonstra o comportamento de bloqueio simulado, mas não valida
-o limite real da ServeRest nem uma janela temporal de um minuto.
+São executados dois testes:
 
-A suíte API contém 16 testes automatizados, incluindo essa simulação.
+- Bloqueio HTTP 429 da requisição 101 após 100 requisições permitidas.
+- Liberação de novas requisições após o encerramento da janela de teste.
 
-## Resultado consolidado da validação local
+A primeira verificação utiliza uma janela de 60 segundos.
+A segunda utiliza uma janela reduzida para testar a recuperação
+sem aguardar um minuto inteiro.
 
-- API: 16 testes aprovados, distribuídos em 6 arquivos, incluindo
-  o API-015 de rate limiting simulado em servidor local.
-- Mobile Android: 10 testes aprovados em 6 arquivos.
-- Allure: relatório final com 10 resultados aprovados,
-  nenhuma falha, nenhum erro e nenhum teste ignorado.
-- Evidência Mobile: `entrega/evidencias/allure-mobile-android.zip`
-  (fornecida separadamente do código-fonte).
-- API: relatório JUnit gerado em `api-tests/reports/junit.xml`.
-- BDD: 15 definições de API, incluindo um esquema com 2 exemplos,
-  e 10 cenários Mobile.
-- iOS: configuração inicial disponível, execução não realizada.
-- GitLab CI/CD: configuração criada, execução não realizada.
+Esses testes validam a integração local do middleware.
+**Não comprovam a existência de rate limiting na ServeRest pública.**
 
-A simulação API-015 não comprova o limite real de 100
-requisições por minuto da API ServeRest.
+## Validação final ampliada da API
+
+- 23 testes de API aprovados em 7 arquivos.
+- 10 testes Mobile Android aprovados em 6 arquivos.
+- Total: 33 testes automatizados aprovados.
+- TypeScript: validação de tipos aprovada.
+- JUnit: relatório consolidado gerado.
+- API-015: dois testes de rate limiting com Express Rate Limit
+  em ambiente local controlado. Não validam a política
+  da API pública ServeRest.
+- API-008: validação estrutural da listagem de usuários.
+- API-009: validação rigorosa do contrato de usuário sintético.
+- Observação: durante uma execução, 1 de 149 registros da
+  ServeRest apresentou um e-mail rejeitado pelo Zod.
+  O achado não foi classificado como defeito confirmado.
+- iOS: execução não realizada.
+- GitLab CI: execução não realizada.
+
+A aprovação dos 33 testes não comprova, por si só,
+100% de cobertura dos requisitos do desafio.
