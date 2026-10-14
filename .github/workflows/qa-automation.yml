@@ -47,6 +47,9 @@ jobs:
     name: Android - Appium e WebdriverIO
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    env:
+      MOBILE_TEST_EMAIL: qa.automation@example.com
+      MOBILE_TEST_PASSWORD: CarrefourQATeste123
 
     steps:
       - name: Checkout
