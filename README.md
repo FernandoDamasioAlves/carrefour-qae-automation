@@ -91,7 +91,7 @@ O arquivo `.gitlab-ci.yml` contém:
 - Publicação de relatório JUnit.
 - Job Android manual, dependente de runner com SDK, emulador e Appium.
 
-**Status:** a pipeline ainda não foi executada no GitLab.
+**Status:** pipeline GitLab #2944807970 executada com sucesso em 13/10/2026. O job `api_tests` aprovou 23 testes em 7 arquivos, validou o TypeScript e publicou o relatório JUnit. Os jobs Mobile permanecem manuais e não foram executados no GitLab.
 
 ## Limitações conhecidas
 
@@ -166,7 +166,7 @@ Esses testes validam a integração local do middleware.
   ServeRest apresentou um e-mail rejeitado pelo Zod.
   O achado não foi classificado como defeito confirmado.
 - iOS: execução não realizada.
-- GitLab CI: execução não realizada.
+- GitLab CI: pipeline #2944807970 aprovada; job de API executado com 23 testes aprovados e JUnit publicado. Jobs Mobile não executados no GitLab.
 
 A aprovação dos 33 testes não comprova, por si só,
 100% de cobertura dos requisitos do desafio.
