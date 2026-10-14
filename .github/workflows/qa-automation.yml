@@ -3,7 +3,7 @@ name: QA Automation - API e Android
 on:
   push:
     branches:
-      - teste/github-actions-android
+      - main
   workflow_dispatch:
 
 jobs:
