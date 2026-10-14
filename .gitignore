@@ -42,3 +42,11 @@ docs/RELATORIO_TECNICO_PRE_15_API.docx
 
 # Backups locais do relatório técnico
 /docs/RELATORIO_TECNICO_ANTES_33_TESTES.docx
+
+# Documentos temporários e backups
+/docs/*.docx
+!/docs/RELATORIO_TECNICO.docx
+
+# Arquivos temporários de auditoria
+**/audit-report.json
+**/audit-fix-preview.txt

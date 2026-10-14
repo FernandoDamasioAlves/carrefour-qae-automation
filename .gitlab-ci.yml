@@ -27,9 +27,9 @@ mobile_android:
   script:
     - cd mobile-tests
     - npm ci
-    - test -n "$(adb devices | grep -E '^[[:alnum:]_.:-]+[[:space:]]+device$')"
-    - adb shell pm path com.wdiodemoapp | grep package
-    - npx appium driver list --installed | grep uiautomator2
+    - adb devices
+    - adb shell pm path com.wdiodemoapp
+    - npx appium driver list --installed
     - npx appium --log-level error > appium-server.log 2>&1 &
     - sleep 10
     - npm run test:android
@@ -38,7 +38,6 @@ mobile_android:
     expire_in: 30 days
     paths:
       - mobile-tests/allure-results/
-      - mobile-tests/artifacts/
       - mobile-tests/appium-server.log
 
 mobile_ios:
@@ -53,7 +52,7 @@ mobile_ios:
     - xcodebuild -version
     - test -n "$IOS_APP_PATH"
     - test -e "$IOS_APP_PATH"
-    - npx appium driver list --installed | grep xcuitest
+    - npx appium driver list --installed
     - npx appium --log-level error > appium-server.log 2>&1 &
     - sleep 10
     - npm run test:ios
@@ -62,5 +61,4 @@ mobile_ios:
     expire_in: 30 days
     paths:
       - mobile-tests/allure-results/
-      - mobile-tests/artifacts/
       - mobile-tests/appium-server.log
