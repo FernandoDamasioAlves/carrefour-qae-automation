@@ -69,9 +69,9 @@ jobs:
         working-directory: mobile-tests
         run: npm ci
 
-      - name: Instalar driver Appium
+      - name: Verificar driver Appium
         working-directory: mobile-tests
-        run: npx appium driver install uiautomator2
+        run: npx appium driver list --installed
 
       - name: Baixar APK oficial
         run: |
