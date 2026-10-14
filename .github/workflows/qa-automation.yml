@@ -1,0 +1,116 @@
+name: QA Automation - API e Android
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  api:
+    name: API - Vitest
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: api-tests
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: api-tests/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Validar TypeScript
+        run: npm run typecheck
+
+      - name: Executar testes
+        run: npm test
+
+      - name: Publicar JUnit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-junit
+          path: api-tests/reports/
+          if-no-files-found: warn
+
+  android:
+    name: Android - Appium e WebdriverIO
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      MOBILE_TEST_EMAIL: qa.automation@example.com
+      MOBILE_TEST_PASSWORD: CarrefourQATeste123
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: mobile-tests/package-lock.json
+
+      - name: Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Instalar dependencias
+        working-directory: mobile-tests
+        run: npm ci
+
+      - name: Verificar driver Appium
+        working-directory: mobile-tests
+        run: npx appium driver list --installed
+
+      - name: Baixar APK oficial
+        run: |
+          curl -fL --retry 3 \
+            -o native-demo.apk \
+            https://github.com/webdriverio/native-demo-app/releases/download/v2.2.0/android.wdio.native.app.v2.2.0.apk
+          test -s native-demo.apk
+
+      - name: Habilitar KVM
+        run: |
+          if [ -e /dev/kvm ]; then
+            echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+            sudo udevadm control --reload-rules
+            sudo udevadm trigger --name-match=kvm
+          else
+            echo "KVM indisponivel neste runner"
+            exit 1
+          fi
+
+      - name: Executar testes no emulador
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_5
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          disable-animations: true
+          script: bash scripts/run-android-ci.sh
+
+      - name: Publicar evidencias Allure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-allure
+          path: |
+            mobile-tests/allure-results/
+            mobile-tests/appium-server.log
+          if-no-files-found: warn
