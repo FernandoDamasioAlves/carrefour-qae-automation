@@ -100,19 +100,7 @@ jobs:
           profile: pixel_5
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
           disable-animations: true
-          script: |
-            adb devices
-            adb install -r native-demo.apk
-            cd mobile-tests
-            npx appium --log-level info > appium-server.log 2>&1 &
-            for i in $(seq 1 60); do
-              if curl -fsS http://127.0.0.1:4723/status >/dev/null; then
-                break
-              fi
-              sleep 2
-            done
-            curl -fsS http://127.0.0.1:4723/status
-            ANDROID_UDID=emulator-5554 npm run test:android
+          script: bash scripts/run-android-ci.sh
 
       - name: Publicar evidencias Allure
         if: always()
