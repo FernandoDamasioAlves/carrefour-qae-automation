@@ -1,172 +1,67 @@
 # Banco Carrefour — Desafio Técnico QAE
 
-Projeto de automação de testes de API e Mobile, desenvolvido para o desafio técnico de Quality Assurance Engineer.
+Desenvolvi este projeto para os desafios de automação de testes de API REST e Mobile Android do Banco Carrefour. Organizei as suítes de forma independente, com documentação, cenários rastreáveis e evidências de execução.
 
-## Estrutura do projeto
+## Estrutura
 
-- `api-tests/` — Testes de API.
-- `mobile-tests/` — Testes Mobile.
-- `docs/` — Relatório técnico.
-- `.gitlab-ci.yml` — Configuração de integração contínua.
+- `api-tests/`: clientes HTTP, massa de dados, schemas e testes de API.
+- `mobile-tests/`: testes Android com Page Object Model e configuração Appium.
+- `bdd/`: especificações de cenários em Gherkin.
+- `docs/RELATORIO_TECNICO.docx`: relatório técnico e matriz de testes.
+- `.gitlab-ci.yml`: integração contínua e publicação do JUnit da API.
 
-## Testes de API
+## Automação de API
 
-**API utilizada:** https://serverest.dev
+Utilizei **TypeScript, Vitest, Supertest e Zod** para validar a [ServeRest](https://serverest.dev). Organizei as chamadas HTTP em clientes reutilizáveis, os dados sintéticos na fábrica `makeUser` e a validação das respostas em schemas.
 
-**Tecnologias:** Node.js, TypeScript, Vitest, Supertest e Zod.
+Cobri operações de criação, consulta, listagem, atualização e exclusão de usuários; validação de campos obrigatórios, autenticação e autorização por token; contratos de resposta e casos negativos. Também desenvolvi dois testes de **rate limiting** em uma aplicação Express local usando `express-rate-limit`, incluindo bloqueio HTTP 429 da 101ª requisição e recuperação após a janela de teste. Essa validação se refere ao middleware controlado, e não à política da ServeRest pública.
 
-### Execução
+**Resultado:** 23 testes aprovados em sete arquivos, com validação TypeScript e saída JUnit. Executei a suíte localmente e no GitLab CI/CD.
 
-1. Acessar a pasta `api-tests`.
-2. Executar `npm ci`.
-3. Executar `npm run typecheck`.
-4. Executar `npm test`.
+### Como executar
 
-### Cenários implementados
+```bash
+cd api-tests
+npm ci
+npm run typecheck
+npm test
+```
 
-- Criação de usuários.
-- Consulta e listagem de usuários.
-- Atualização e exclusão.
-- Validação de dados.
-- Verificação de contratos de resposta.
-- Autenticação.
+A variável `API_BASE_URL` permite configurar a URL do serviço; o padrão é `https://serverest.dev`. O relatório é gerado em `api-tests/reports/junit.xml`.
 
-**Resultado local:** 23 testes de API aprovados em 7 arquivos.
+## Automação Mobile Android
 
-**Relatório JUnit:** `api-tests/reports/junit.xml`.
+Utilizei **WebdriverIO, Appium, UiAutomator2, Mocha e Page Object Model** para automatizar o aplicativo **WebdriverIO Native Demo App v2.2.0**.
 
-## Testes Mobile
+Implementei dez cenários: exibição da tela inicial (MOB-001), acesso ao login (MOB-002), preenchimento de credenciais (MOB-003), validação de e-mail inválido (MOB-004), navegação até cadastro (MOB-005), verificação de campos (MOB-006), preenchimento de cadastro (MOB-007), entrada e exibição de texto (MOB-008), mudança de estado de switch (MOB-009) e interação com dropdown (MOB-010).
 
-**Aplicativo:** WebdriverIO Native Demo App v2.2.0.
+**Resultado:** dez testes Android aprovados em seis arquivos, com relatório Allure. Configurei screenshots automáticos em caso de falha; na execução consolidada, todos os testes passaram. O Allure registra Android 15, emulador `Carrefour_QAE_API35`, versão do aplicativo, ferramentas e tipo de execução.
 
-**Tecnologias:** WebdriverIO, Appium, UiAutomator2, Mocha e Page Object Model.
+### Pré-requisitos e execução
 
-### Pré-requisitos
+1. Preparar Node.js, Java JDK, Android SDK, emulador e Appium com driver UiAutomator2.
+2. Instalar no emulador o Native Demo App v2.2.0 (`com.wdiodemoapp`).
+3. No diretório `mobile-tests`, executar `npm ci`, copiar `.env.example` para `.env` e configurar os dados sintéticos.
+4. Confirmar o dispositivo com `adb devices`, iniciar `npx appium` e executar `npm run test:android`.
 
-- Node.js.
-- Java JDK.
-- Android SDK e emulador Android.
-- Appium com driver UiAutomator2.
-- Aplicativo `com.wdiodemoapp` instalado.
+As evidências da execução estão reunidas no pacote Allure da entrega. O teste de cadastro valida apresentação e preenchimento dos campos, sem concluir uma criação de conta.
 
-### Configuração
+## Integração contínua e evidências
 
-1. Acessar a pasta `mobile-tests`.
-2. Executar `npm ci`.
-3. Copiar `.env.example` para `.env`.
-4. Configurar as variáveis com dados sintéticos.
-5. Confirmar o dispositivo usando `adb devices`.
-6. Iniciar o servidor com `npx appium`.
+Configurei a pipeline em `.gitlab-ci.yml`. No job `api_tests`, o runner instala as dependências com `npm ci`, verifica os tipos, executa os testes e publica `reports/junit.xml` como artefato.
 
-### Execução
+**Pipeline de referência:** [#2944807970](https://gitlab.com/fernando-damasio-group/carrefour-qae-automation/-/pipelines/2944807970) — 23 testes de API aprovados. Também executei pipelines posteriores com aprovação.
 
-Executar `npm run test:android` na pasta `mobile-tests`.
+A suíte Android foi executada e validada localmente. O arquivo de CI contém um job Mobile que depende de um runner com SDK, emulador e Appium; não há evidência de execução desse job no GitLab. A execução iOS não integrou a validação, conforme alinhamento da entrega com a recrutadora.
 
-### Cenários implementados
+## Especificações e documentação
 
-- MOB-001: Exibição da tela inicial.
-- MOB-002: Acesso ao Login.
-- MOB-003: Preenchimento de credenciais.
-- MOB-004: Validação de e-mail inválido.
-- MOB-005: Navegação para cadastro.
-- MOB-006: Exibição dos campos de cadastro.
-- MOB-007: Preenchimento de dados de cadastro.
-- MOB-008: Entrada e apresentação de texto.
-- MOB-009: Alternância do switch e verificação da mensagem.
-- MOB-010: Abertura e verificação de opção do dropdown.
+Registrei os comportamentos em `bdd/api.feature` e `bdd/mobile.feature` e relaciono os identificadores aos testes no relatório técnico. Os arquivos Gherkin são especificações de apoio; os testes são executados por Vitest e por WebdriverIO/Mocha, sem integração com Cucumber.
 
-**Resultado local:** 10 testes Android aprovados na mesma execução, distribuídos em seis arquivos.
+**Total comprovado:** 23 execuções de API e dez de Android aprovadas. Os resultados representam a cobertura dos cenários implementados, não uma medição de cobertura do código-fonte da API pública.
 
-### Evidências
+O relatório completo está em [`docs/RELATORIO_TECNICO.docx`](docs/RELATORIO_TECNICO.docx).
 
-O projeto está configurado para utilizar Allure Reporter e capturar screenshots em caso de falha.
+## Cuidados com dados de teste
 
-## Integração contínua
-
-O arquivo `.gitlab-ci.yml` contém:
-
-- Job de testes de API com Node.js.
-- Validação de tipos TypeScript.
-- Execução de Vitest.
-- Publicação de relatório JUnit.
-- Job Android manual, dependente de runner com SDK, emulador e Appium.
-
-**Status:** pipeline GitLab #2944807970 executada com sucesso em 13/10/2026. O job `api_tests` aprovou 23 testes em 7 arquivos, validou o TypeScript e publicou o relatório JUnit. Os jobs Mobile permanecem manuais e não foram executados no GitLab.
-
-## Limitações conhecidas
-
-- A execução Mobile foi validada no Android, não no iOS.
-- Não houve execução Mobile em runner GitLab.
-- A cobertura funcional implementada não comprova cobertura integral de todos os requisitos do desafio.
-- O cadastro foi verificado quanto à apresentação e ao preenchimento de campos, sem submissão efetiva.
-- Há alertas de segurança em dependências de desenvolvimento do ecossistema Appium que ainda precisam de tratamento.
-
-## Segurança
-
-- Dados sintéticos são utilizados nos testes.
-- O arquivo `.env` não deve ser incluído no controle de versão.
-- Relatórios e logs devem ser revisados antes do compartilhamento para evitar exposição de dados sensíveis.
-
-## Documentação
-
-O relatório técnico está disponível em `docs/RELATORIO_TECNICO.docx`.
-
-## Especificações BDD
-
-As especificações comportamentais estão disponíveis em:
-
-- `bdd/api.feature`: 14 definições BDD de API (15 exemplos executáveis), identificados de API-001 a API-014.
-- `bdd/mobile.feature`: 10 cenários Mobile, identificados de MOB-001 a MOB-010.
-
-Os arquivos utilizam Gherkin em português, com Dado/Quando/Então.
-
-Cada cenário corresponde funcionalmente a um teste automatizado existente.
-A automação é executada com Vitest (API) e WebdriverIO/Mocha (Mobile).
-Os arquivos `.feature` não possuem integração com Cucumber nem step definitions.
-
-### Cobertura adicional de API
-
-- API-013: Token válido permite alcançar a validação de recurso protegido.
-- API-014: Cadastro sem e-mail e sem senha, em duas variações.
-- Suíte completa: 23 testes de API aprovados em 13/10/2026.
-- TypeScript: verificação `npm run typecheck` aprovada.
-
-O limite de 100 requisições/minuto ainda não foi validado.
-
-## Rate limiting — validação controlada
-
-O arquivo `api-tests/tests/rate-limit.spec.ts` utiliza
-`express-rate-limit` em um servidor Express local.
-
-São executados dois testes:
-
-- Bloqueio HTTP 429 da requisição 101 após 100 requisições permitidas.
-- Liberação de novas requisições após o encerramento da janela de teste.
-
-A primeira verificação utiliza uma janela de 60 segundos.
-A segunda utiliza uma janela reduzida para testar a recuperação
-sem aguardar um minuto inteiro.
-
-Esses testes validam a integração local do middleware.
-**Não comprovam a existência de rate limiting na ServeRest pública.**
-
-## Validação final ampliada da API
-
-- 23 testes de API aprovados em 7 arquivos.
-- 10 testes Mobile Android aprovados em 6 arquivos.
-- Total: 33 testes automatizados aprovados.
-- TypeScript: validação de tipos aprovada.
-- JUnit: relatório consolidado gerado.
-- API-015: dois testes de rate limiting com Express Rate Limit
-  em ambiente local controlado. Não validam a política
-  da API pública ServeRest.
-- API-008: validação estrutural da listagem de usuários.
-- API-009: validação rigorosa do contrato de usuário sintético.
-- Observação: durante uma execução, 1 de 149 registros da
-  ServeRest apresentou um e-mail rejeitado pelo Zod.
-  O achado não foi classificado como defeito confirmado.
-- iOS: execução não realizada.
-- GitLab CI: pipeline #2944807970 aprovada; job de API executado com 23 testes aprovados e JUnit publicado. Jobs Mobile não executados no GitLab.
-
-A aprovação dos 33 testes não comprova, por si só,
-100% de cobertura dos requisitos do desafio.
+Utilizei dados sintéticos e mantive o arquivo `.env` fora do controle de versão. O arquivo `.env.example` contém somente parâmetros de referência.
