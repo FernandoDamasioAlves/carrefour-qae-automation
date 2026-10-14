@@ -8,7 +8,9 @@ Desenvolvi este projeto para os desafios de automação de testes de API REST e 
 - `mobile-tests/`: testes Android com Page Object Model e configuração Appium.
 - `bdd/`: especificações de cenários em Gherkin.
 - `docs/RELATORIO_TECNICO.docx`: relatório técnico e matriz de testes.
-- `.gitlab-ci.yml`: integração contínua e publicação do JUnit da API.
+- `.github/workflows/qa-automation.yml`: CI/CD de API e Android no GitHub Actions.
+- `.gitlab-ci.yml`: pipeline adicional de API no GitLab.
+- `scripts/run-android-ci.sh`: inicialização do Appium e execução Android em CI.
 
 ## Automação de API
 
@@ -16,7 +18,7 @@ Utilizei **TypeScript, Vitest, Supertest e Zod** para validar a [ServeRest](http
 
 Cobri operações de criação, consulta, listagem, atualização e exclusão de usuários; validação de campos obrigatórios, autenticação e autorização por token; contratos de resposta e casos negativos. Também desenvolvi dois testes de **rate limiting** em uma aplicação Express local usando `express-rate-limit`, incluindo bloqueio HTTP 429 da 101ª requisição e recuperação após a janela de teste. Essa validação se refere ao middleware controlado, e não à política da ServeRest pública.
 
-**Resultado:** 23 testes aprovados em sete arquivos, com validação TypeScript e saída JUnit. Executei a suíte localmente e no GitLab CI/CD.
+**Resultado:** 23 testes aprovados em sete arquivos, com validação TypeScript e saída JUnit. Executei a suíte localmente, no GitLab CI/CD e no GitHub Actions.
 
 ### Como executar
 
@@ -44,15 +46,30 @@ Implementei dez cenários: exibição da tela inicial (MOB-001), acesso ao login
 3. No diretório `mobile-tests`, executar `npm ci`, copiar `.env.example` para `.env` e configurar os dados sintéticos.
 4. Confirmar o dispositivo com `adb devices`, iniciar `npx appium` e executar `npm run test:android`.
 
-As evidências da execução estão reunidas no pacote Allure da entrega. O teste de cadastro valida apresentação e preenchimento dos campos, sem concluir uma criação de conta.
+As evidências locais estão preservadas em Allure, e a execução em CI publica os resultados como artefatos do GitHub Actions. O teste de cadastro valida apresentação e preenchimento dos campos, sem concluir uma criação de conta.
 
 ## Integração contínua e evidências
 
-Configurei a pipeline em `.gitlab-ci.yml`. No job `api_tests`, o runner instala as dependências com `npm ci`, verifica os tipos, executa os testes e publica `reports/junit.xml` como artefato.
+Configurei o **GitHub Actions** para executar automaticamente os testes de API e Mobile Android. A pipeline utiliza Node.js, Java, Appium e um emulador Android provisionado durante o próprio workflow.
 
-**Pipeline de referência:** [#2944807970](https://gitlab.com/fernando-damasio-group/carrefour-qae-automation/-/pipelines/2944807970) — 23 testes de API aprovados. Também executei pipelines posteriores com aprovação.
+Na suíte de API, executo `npm ci`, validação TypeScript e Vitest. Na suíte Mobile, preparo o emulador Android, instalo o aplicativo demonstrativo e executo os cenários com WebdriverIO e Appium.
 
-A suíte Android foi executada e validada localmente. O arquivo de CI contém um job Mobile que depende de um runner com SDK, emulador e Appium; não há evidência de execução desse job no GitLab. A execução iOS não integrou a validação, conforme alinhamento da entrega com a recrutadora.
+**Resultado comprovado no GitHub Actions:**
+
+- API: **23 testes aprovados** em 7 arquivos.
+- Mobile Android: **10 testes aprovados** em 6 arquivos.
+- **33 testes aprovados no total**, com os dois jobs concluídos com sucesso.
+- Relatórios **JUnit e Allure** publicados como artefatos da execução.
+
+**Execução de referência:** [GitHub Actions — API e Android](https://github.com/FernandoDamasioAlves/carrefour-qae-automation/actions/runs/38601257714).
+
+Também configurei o GitLab CI/CD, onde validei a execução automatizada da suíte de API e a publicação do JUnit.
+
+### Execução pela pipeline
+
+O workflow está em `.github/workflows/qa-automation.yml`, configurado para a branch `main` e com acionamento manual (`workflow_dispatch`).
+
+Os artefatos de cada execução podem ser consultados na aba **Actions**, dentro do workflow correspondente.
 
 ## Especificações e documentação
 
