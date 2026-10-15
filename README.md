@@ -82,3 +82,15 @@ O relatório completo está em [`docs/RELATORIO_TECNICO.docx`](docs/RELATORIO_TE
 ## Cuidados com dados de teste
 
 Utilizei dados sintéticos e mantive o arquivo `.env` fora do controle de versão. O arquivo `.env.example` contém somente parâmetros de referência.
+
+
+## Validação final da automação
+
+Validei a execução integrada das suítes no GitHub Actions, na branch `main`.
+
+- API REST: 23 testes aprovados.
+- Mobile Android: 10 testes aprovados.
+- Total: 33 testes automatizados aprovados.
+- Evidências: relatórios JUnit e Allure publicados como artefatos.
+
+A implementação e a documentação técnica estão disponíveis neste repositório.
