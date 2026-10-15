@@ -21,7 +21,7 @@ export const config = {
     'appium:udid': process.env.ANDROID_UDID || 'emulator-5554',
     'appium:appPackage': 'com.wdiodemoapp',
     'appium:appActivity': '.MainActivity',
-    'appium:noReset': true,
+    'appium:noReset': false,
     'appium:uiautomator2ServerLaunchTimeout': 90000,
     'appium:appWaitDuration': 60000
   }],
